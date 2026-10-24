@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{{ scenario.title }} - Beacon Safety{% endblock %}
+{% block title %}{{ scenario.title }} - beacon Safety{% endblock %}
 {% block content %}
 <a href="{% url 'level_detail' scenario.level.id %}" class="text-muted" style="text-decoration:none;">&larr; Back to {{ scenario.level.name }}</a>
 <h1 class="mt-1 mb-1">{{ scenario.title }}</h1>
 <div class="card mb-1">
-    <p>{{ scenario.description }}</p>
+    <span class="badge badge-blue mb-1">{{ scenario.get_difficulty_display }}</span>
+    <p style="color:var(--text-secondary); line-height:1.7;">{{ scenario.description }}</p>
     {% if scenario.video_url %}
     <div class="mt-1">
         <iframe src="{{ scenario.video_url }}" style="width:100%; aspect-ratio:16/9; border:none; border-radius:var(--radius);"></iframe>
@@ -16,14 +17,14 @@
     {% csrf_token %}
     {% for question in questions %}
     <div class="card">
-        <p style="font-weight:600; margin-bottom:0.75rem;">{{ forloop.counter }}. {{ question.text }}</p>
+        <p style="font-weight:700; margin-bottom:0.75rem; color:var(--beacon-black);">{{ forloop.counter }}. {{ question.text }}</p>
 
         {% if question.question_type == "open_ended" %}
-            <textarea name="question_{{ question.id }}" rows="4" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:var(--radius); font-size:0.9rem;" placeholder="Type your response..."></textarea>
+            <textarea name="question_{{ question.id }}" rows="4" style="width:100%; padding:0.65rem 0.75rem; border:2px solid var(--border); border-radius:var(--radius); font-size:0.9rem; font-family:inherit;" placeholder="Type your response..."></textarea>
         {% else %}
             {% for choice in question.choices.all %}
-            <label style="display:block; padding:0.5rem; margin-bottom:0.3rem; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer;">
-                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" style="margin-right:0.5rem;">
+            <label style="display:block; padding:0.65rem 0.75rem; margin-bottom:0.4rem; border:2px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:border-color 0.15s, background 0.15s; font-size:0.9rem;">
+                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" style="margin-right:0.5rem; accent-color:var(--beacon-blue);">
                 {{ choice.text }}
             </label>
             {% endfor %}
@@ -36,7 +37,7 @@
     {% endfor %}
 
     {% if questions %}
-    <button type="submit" class="btn btn-success btn-block mt-1">Submit Answers</button>
+    <button type="submit" class="btn btn-dark btn-block mt-1" style="font-size:1rem; padding:0.8rem;">Submit Answers</button>
     {% endif %}
 </form>
 {% endblock %}

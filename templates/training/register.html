@@ -1,7 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Register - Beacon Safety{% endblock %}
+{% block title %}Register - beacon Safety{% endblock %}
 {% block content %}
 <div style="max-width: 400px; margin: 2rem auto;">
+    <div style="text-align:center; margin-bottom:1.5rem;">
+        <div style="font-size:2rem; font-weight:900; letter-spacing:-0.02em; text-transform:lowercase;">
+            <span style="background:var(--beacon-blue); color:white; padding:0.1em 0.4em; border-radius:6px;">beacon</span>
+        </div>
+        <p class="text-secondary mt-1" style="font-weight:600;">Join the Safety Team</p>
+    </div>
     <div class="card">
         <h2>Create Account</h2>
         <form method="post">
@@ -16,7 +22,7 @@
             <button type="submit" class="btn btn-primary btn-block">Register</button>
         </form>
         <p class="text-muted mt-2" style="text-align:center;">
-            Already have an account? <a href="{% url 'login' %}">Log in</a>
+            Already have an account? <a href="{% url 'login' %}" style="color:var(--beacon-blue); font-weight:700;">Log in</a>
         </p>
     </div>
 </div>

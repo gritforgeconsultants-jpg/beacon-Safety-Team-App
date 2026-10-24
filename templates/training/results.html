@@ -1,32 +1,36 @@
 {% extends "base.html" %}
-{% block title %}Results - Beacon Safety{% endblock %}
+{% block title %}Results - beacon Safety{% endblock %}
 {% block content %}
 <div style="max-width: 500px; margin: 2rem auto; text-align:center;">
-    <div class="card">
+    <div class="card" style="padding:2rem;">
         {% if passed %}
-            <div style="font-size:3rem; margin-bottom:0.5rem;">&#10003;</div>
+            <div style="width:80px; height:80px; border-radius:50%; background:var(--success-light); display:inline-flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+                <span style="font-size:2.5rem; color:var(--success);">&#10003;</span>
+            </div>
             <h1 style="color:var(--success);">Passed!</h1>
         {% else %}
-            <div style="font-size:3rem; margin-bottom:0.5rem;">&#10007;</div>
+            <div style="width:80px; height:80px; border-radius:50%; background:var(--danger-light); display:inline-flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+                <span style="font-size:2.5rem; color:var(--danger);">&#10007;</span>
+            </div>
             <h1 style="color:var(--danger);">Not Passed</h1>
         {% endif %}
 
         <h2 class="mt-1">{{ scenario.title }}</h2>
-        <p class="text-muted mt-1">Level: {{ scenario.level.name }}</p>
+        <p class="text-muted mt-1">{{ scenario.level.name }}</p>
 
-        <div style="font-size:3rem; font-weight:700; margin:1rem 0; color:{% if passed %}var(--success){% else %}var(--danger){% endif %};">
+        <div style="font-size:3.5rem; font-weight:900; margin:1rem 0; color:{% if passed %}var(--success){% else %}var(--danger){% endif %}; letter-spacing:-0.02em;">
             {{ score }}%
         </div>
 
-        <p class="text-muted">{{ correct }} of {{ total }} questions correct</p>
-        <p class="text-muted">Passing score: {{ scenario.level.passing_score }}%</p>
+        <p class="text-secondary">{{ correct }} of {{ total }} questions correct</p>
+        <p class="text-muted" style="font-size:0.8rem;">Passing score: {{ scenario.level.passing_score }}%</p>
 
         <div class="mt-2" style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
             {% if not passed %}
                 <a href="{% url 'scenario_start' scenario.id %}" class="btn btn-primary">Try Again</a>
             {% endif %}
-            <a href="{% url 'level_detail' scenario.level.id %}" class="btn btn-primary">Back to Level</a>
-            <a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a>
+            <a href="{% url 'level_detail' scenario.level.id %}" class="btn btn-dark">Back to Level</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-dark">Dashboard</a>
         </div>
     </div>
 </div>

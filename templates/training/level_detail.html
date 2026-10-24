@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}{{ level.name }} - Beacon Safety{% endblock %}
+{% block title %}{{ level.name }} - beacon Safety{% endblock %}
 {% block content %}
 <a href="{% url 'dashboard' %}" class="text-muted" style="text-decoration:none;">&larr; Back to Dashboard</a>
 <h1 class="mt-1 mb-1">{{ level.name }}</h1>
-<p class="text-muted mb-1">{{ level.description }}</p>
-<p class="text-muted mb-1">Passing score: <strong>{{ level.passing_score }}%</strong></p>
+<p class="text-secondary mb-1">{{ level.description }}</p>
+<p class="text-muted mb-2">Passing score: <strong style="color:var(--beacon-blue);">{{ level.passing_score }}%</strong></p>
 
 <div class="grid">
     {% for item in scenario_data %}
@@ -17,10 +17,10 @@
         </div>
         <p class="text-muted mt-1">{{ item.scenario.description|truncatewords:25 }}</p>
         <div class="mt-1" style="display:flex; gap:0.5rem; align-items:center;">
-            <span class="badge badge-warning">{{ item.scenario.get_difficulty_display }}</span>
+            <span class="badge badge-blue">{{ item.scenario.get_difficulty_display }}</span>
             <span class="text-muted">{{ item.scenario.questions.count }} questions</span>
         </div>
-        <a href="{% url 'scenario_start' item.scenario.id %}" class="btn btn-primary mt-1" style="font-size:0.85rem;">
+        <a href="{% url 'scenario_start' item.scenario.id %}" class="btn btn-primary mt-1" style="font-size:0.8rem;">
             {% if item.passed %}Retake{% else %}Start{% endif %}
         </a>
     </div>
