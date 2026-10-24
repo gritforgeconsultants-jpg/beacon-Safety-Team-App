@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Level Locked - Beacon Safety{% endblock %}
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto; text-align:center;">
+    <div class="card">
+        <div style="font-size:3rem; margin-bottom:0.5rem;">&#128274;</div>
+        <h1>Level Locked</h1>
+        <p class="text-muted mt-1">Complete all scenarios in previous levels to unlock <strong>{{ level.name }}</strong>.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-primary mt-2">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

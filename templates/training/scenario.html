@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ scenario.title }} - Beacon Safety{% endblock %}
+{% block content %}
+<a href="{% url 'level_detail' scenario.level.id %}" class="text-muted" style="text-decoration:none;">&larr; Back to {{ scenario.level.name }}</a>
+<h1 class="mt-1 mb-1">{{ scenario.title }}</h1>
+<div class="card mb-1">
+    <p>{{ scenario.description }}</p>
+    {% if scenario.video_url %}
+    <div class="mt-1">
+        <iframe src="{{ scenario.video_url }}" style="width:100%; aspect-ratio:16/9; border:none; border-radius:var(--radius);"></iframe>
+    </div>
+    {% endif %}
+</div>
+
+<form method="post" action="{% url 'scenario_submit' scenario.id %}">
+    {% csrf_token %}
+    {% for question in questions %}
+    <div class="card">
+        <p style="font-weight:600; margin-bottom:0.75rem;">{{ forloop.counter }}. {{ question.text }}</p>
+
+        {% if question.question_type == "open_ended" %}
+            <textarea name="question_{{ question.id }}" rows="4" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:var(--radius); font-size:0.9rem;" placeholder="Type your response..."></textarea>
+        {% else %}
+            {% for choice in question.choices.all %}
+            <label style="display:block; padding:0.5rem; margin-bottom:0.3rem; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer;">
+                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" style="margin-right:0.5rem;">
+                {{ choice.text }}
+            </label>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="card">
+        <p class="text-muted">No questions have been added to this scenario yet.</p>
+    </div>
+    {% endfor %}
+
+    {% if questions %}
+    <button type="submit" class="btn btn-success btn-block mt-1">Submit Answers</button>
+    {% endif %}
+</form>
+{% endblock %}

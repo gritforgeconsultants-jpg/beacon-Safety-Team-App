@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Beacon Safety{% endblock %}
+{% block content %}
+<h1 class="mb-1">Welcome, {{ user.get_short_name|default:user.username }}</h1>
+<p class="text-muted mb-1">
+    {% if progress.current_level %}
+        Current Level: <strong>{{ progress.current_level }}</strong>
+    {% else %}
+        No levels available yet.
+    {% endif %}
+    | Scenarios Completed: <strong>{{ progress.total_scenarios_completed }}</strong>
+</p>
+
+<h2 class="mt-2 mb-1">Training Levels</h2>
+<div class="grid">
+    {% for item in level_data %}
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0;">{{ item.level.name }}</h2>
+            {% if item.unlocked %}
+                {% if item.completed == item.total and item.total > 0 %}
+                    <span class="badge badge-success">Complete</span>
+                {% else %}
+                    <span class="badge badge-warning">{{ item.completed }}/{{ item.total }}</span>
+                {% endif %}
+            {% else %}
+                <span class="badge badge-locked">Locked</span>
+            {% endif %}
+        </div>
+        <p class="text-muted mt-1">{{ item.level.description }}</p>
+        {% if item.total > 0 %}
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: {% widthratio item.completed item.total 100 %}%;"></div>
+        </div>
+        {% endif %}
+        {% if item.unlocked %}
+            <a href="{% url 'level_detail' item.level.id %}" class="btn btn-primary mt-1" style="font-size:0.85rem;">View Scenarios</a>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="card">
+        <p class="text-muted">No training levels have been created yet. An admin can add them via the admin panel.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if recent_attempts %}
+<h2 class="mt-2 mb-1">Recent Activity</h2>
+<div class="card">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+        <thead>
+            <tr style="border-bottom:2px solid var(--border); text-align:left;">
+                <th style="padding:0.5rem;">Scenario</th>
+                <th style="padding:0.5rem;">Score</th>
+                <th style="padding:0.5rem;">Result</th>
+                <th style="padding:0.5rem;">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attempt in recent_attempts %}
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:0.5rem;">{{ attempt.scenario.title }}</td>
+                <td style="padding:0.5rem;">{{ attempt.score }}%</td>
+                <td style="padding:0.5rem;">
+                    {% if attempt.passed %}
+                        <span class="badge badge-success">Passed</span>
+                    {% else %}
+                        <span class="badge" style="background:#fadbd8;color:#922b21;">Failed</span>
+                    {% endif %}
+                </td>
+                <td style="padding:0.5rem;">{{ attempt.started_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
