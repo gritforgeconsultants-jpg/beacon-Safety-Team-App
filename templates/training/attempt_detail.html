@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Review: {{ attempt.scenario.title }} - Beacon Safety{% endblock %}
+{% block content %}
+<a href="{% url 'history' %}" class="text-muted" style="text-decoration:none;">&larr; Back to History</a>
+
+<div class="card mt-1">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+            <h1 style="margin:0;">{{ attempt.scenario.title }}</h1>
+            <p class="text-muted">{{ attempt.scenario.level.name }} &middot; {{ attempt.completed_at|date:"M d, Y g:i A" }}</p>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:2.5rem; font-weight:700; color:{% if attempt.passed %}var(--success){% else %}var(--danger){% endif %};">
+                {{ attempt.score }}%
+            </div>
+            {% if attempt.passed %}
+                <span class="badge badge-success">Passed</span>
+            {% else %}
+                <span class="badge" style="background:#fadbd8;color:#922b21;">Failed</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<h2 class="mt-2 mb-1">Your Answers</h2>
+
+{% for item in review_data %}
+<div class="card" style="border-left: 4px solid {% if item.response.question.question_type == 'open_ended' %}var(--primary-light){% elif item.response.is_correct %}var(--success){% else %}var(--danger){% endif %};">
+    <p style="font-weight:600; margin-bottom:0.75rem;">{{ forloop.counter }}. {{ item.question.text }}</p>
+
+    {% if item.question.question_type == "open_ended" %}
+        <div style="background:var(--bg); padding:0.75rem; border-radius:var(--radius); margin-bottom:0.5rem;">
+            <span class="text-muted" style="font-size:0.8rem;">Your response:</span>
+            <p style="margin-top:0.25rem;">{{ item.response.open_ended_answer|default:"No response provided" }}</p>
+        </div>
+        <p class="text-muted" style="font-size:0.85rem;">Open-ended responses are reviewed by your team lead.</p>
+    {% else %}
+        <div style="margin-bottom:0.5rem;">
+            <span class="text-muted" style="font-size:0.8rem;">Your answer:</span>
+            <p style="margin-top:0.25rem; {% if not item.response.is_correct %}color:var(--danger);{% endif %}">
+                {% if item.response.selected_choice %}
+                    {{ item.response.selected_choice.text }}
+                    {% if item.response.is_correct %}
+                        <span class="badge badge-success" style="margin-left:0.3rem;">Correct</span>
+                    {% else %}
+                        <span class="badge" style="background:#fadbd8;color:#922b21;margin-left:0.3rem;">Incorrect</span>
+                    {% endif %}
+                {% else %}
+                    <em class="text-muted">No answer selected</em>
+                {% endif %}
+            </p>
+        </div>
+        {% if not item.response.is_correct and item.correct_choice %}
+        <div style="background:#d5f5e3; padding:0.5rem 0.75rem; border-radius:var(--radius);">
+            <span style="font-size:0.85rem; color:#1e8449;"><strong>Correct answer:</strong> {{ item.correct_choice.text }}</span>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% empty %}
+<div class="card">
+    <p class="text-muted">No detailed response data available for this attempt.</p>
+</div>
+{% endfor %}
+
+<div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1rem;">
+    <a href="{% url 'scenario_start' attempt.scenario.id %}" class="btn btn-primary">Retake Scenario</a>
+    <a href="{% url 'history' %}" class="btn btn-primary">All History</a>
+</div>
+{% endblock %}

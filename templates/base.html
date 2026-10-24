@@ -118,6 +118,7 @@
         <div class="nav-links">
             {% if user.is_authenticated %}
                 <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'history' %}">History</a>
                 {% if user.role == 'admin' or user.role == 'team_lead' %}
                     <a href="{% url 'team_dashboard' %}">Team</a>
                 {% endif %}

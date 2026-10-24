@@ -177,9 +177,79 @@ def scenario_submit(request, scenario_id):
 
 
 @login_required
+def history(request):
+    attempts = ScenarioAttempt.objects.filter(
+        user=request.user,
+        completed_at__isnull=False,
+    ).select_related("scenario", "scenario__level")
+
+    stats = {
+        "total_attempts": attempts.count(),
+        "passed": attempts.filter(passed=True).count(),
+        "avg_score": attempts.aggregate(avg=models.Avg("score"))["avg"] or 0,
+        "best_score": attempts.aggregate(best=models.Max("score"))["best"] or 0,
+    }
+
+    return render(request, "training/history.html", {
+        "attempts": attempts,
+        "stats": stats,
+    })
+
+
+@login_required
+def attempt_detail(request, attempt_id):
+    attempt = get_object_or_404(
+        ScenarioAttempt.objects.select_related("scenario", "scenario__level"),
+        pk=attempt_id,
+        user=request.user,
+    )
+    responses = Response.objects.filter(
+        user=request.user,
+        question__scenario=attempt.scenario,
+        answered_at__gte=attempt.started_at,
+    ).select_related("question", "selected_choice").order_by("question__order")
+
+    if attempt.completed_at:
+        responses = responses.filter(answered_at__lte=attempt.completed_at)
+
+    review_data = []
+    for resp in responses:
+        correct_choice = resp.question.choices.filter(is_correct=True).first()
+        review_data.append({
+            "question": resp.question,
+            "response": resp,
+            "correct_choice": correct_choice,
+        })
+
+    return render(request, "training/attempt_detail.html", {
+        "attempt": attempt,
+        "review_data": review_data,
+    })
+
+
+@login_required
 def team_dashboard(request):
     if request.user.role not in ("admin", "team_lead"):
         return redirect("dashboard")
 
     members = UserProgress.objects.select_related("user", "current_level").all()
-    return render(request, "training/team_dashboard.html", {"members": members})
+
+    team_stats = []
+    for member in members:
+        attempts = ScenarioAttempt.objects.filter(user=member.user, completed_at__isnull=False)
+        avg = attempts.aggregate(avg=models.Avg("score"))["avg"]
+        team_stats.append({
+            "user": member.user,
+            "progress": member,
+            "total_attempts": attempts.count(),
+            "passed": attempts.filter(passed=True).count(),
+            "avg_score": round(avg, 1) if avg else 0,
+            "last_activity": attempts.order_by("-completed_at").values_list("completed_at", flat=True).first(),
+        })
+
+    total_scenarios = Scenario.objects.count()
+
+    return render(request, "training/team_dashboard.html", {
+        "team_stats": team_stats,
+        "total_scenarios": total_scenarios,
+    })

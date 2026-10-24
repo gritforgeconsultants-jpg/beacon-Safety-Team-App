@@ -2,27 +2,62 @@
 {% block title %}Team Dashboard - Beacon Safety{% endblock %}
 {% block content %}
 <h1 class="mb-1">Team Progress</h1>
-<div class="card">
-    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+<p class="text-muted mb-1">{{ team_stats|length }} team members &middot; {{ total_scenarios }} scenarios available</p>
+
+<div class="card" style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem; min-width:600px;">
         <thead>
             <tr style="border-bottom:2px solid var(--border); text-align:left;">
                 <th style="padding:0.5rem;">Member</th>
                 <th style="padding:0.5rem;">Position</th>
                 <th style="padding:0.5rem;">Current Level</th>
-                <th style="padding:0.5rem;">Completed</th>
+                <th style="padding:0.5rem;">Attempts</th>
+                <th style="padding:0.5rem;">Passed</th>
+                <th style="padding:0.5rem;">Avg Score</th>
+                <th style="padding:0.5rem;">Last Activity</th>
             </tr>
         </thead>
         <tbody>
-            {% for member in members %}
+            {% for member in team_stats %}
             <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:0.5rem;">{{ member.user.get_full_name|default:member.user.username }}</td>
+                <td style="padding:0.5rem; font-weight:600;">{{ member.user.get_full_name|default:member.user.username }}</td>
                 <td style="padding:0.5rem;">{{ member.user.position|default:"-" }}</td>
-                <td style="padding:0.5rem;">{{ member.current_level|default:"Not started" }}</td>
-                <td style="padding:0.5rem;">{{ member.total_scenarios_completed }}</td>
+                <td style="padding:0.5rem;">
+                    {% if member.progress.current_level %}
+                        {{ member.progress.current_level.name }}
+                    {% else %}
+                        <span class="text-muted">Not started</span>
+                    {% endif %}
+                </td>
+                <td style="padding:0.5rem;">{{ member.total_attempts }}</td>
+                <td style="padding:0.5rem;">
+                    {% if member.total_attempts > 0 %}
+                        {{ member.passed }}
+                        <span class="text-muted">({% widthratio member.passed member.total_attempts 100 %}%)</span>
+                    {% else %}
+                        0
+                    {% endif %}
+                </td>
+                <td style="padding:0.5rem;">
+                    {% if member.avg_score > 0 %}
+                        <span style="color:{% if member.avg_score >= 80 %}var(--success){% elif member.avg_score >= 60 %}var(--warning){% else %}var(--danger){% endif %}; font-weight:600;">
+                            {{ member.avg_score }}%
+                        </span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td style="padding:0.5rem;">
+                    {% if member.last_activity %}
+                        {{ member.last_activity|date:"M d, Y" }}
+                    {% else %}
+                        <span class="text-muted">No activity</span>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" style="padding:1rem; text-align:center;" class="text-muted">No team members yet.</td>
+                <td colspan="7" style="padding:1rem; text-align:center;" class="text-muted">No team members yet.</td>
             </tr>
             {% endfor %}
         </tbody>
